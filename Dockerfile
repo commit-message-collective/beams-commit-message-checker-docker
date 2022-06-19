@@ -18,4 +18,4 @@ WORKDIR /app
 COPY . /app
 RUN python -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt
-ENTRYPOINT python pipeline.py
+CMD python pipeline.py "$COMMIT_MESSAGE"

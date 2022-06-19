@@ -92,22 +92,22 @@ def check_beams(message):
   try:
     if not is_subject_separated_from_body_by_blank_line(message):
       status = 'Subject line must be separated from the commit message body by a blank line.'
-      score = 'body-no-leading-empty-line'
+      score = '1'
     elif not is_subject_max_72_chars(message):
       status = 'Subject line must not be longer than 72 characters.'
-      score = 'subject-longer-than-72-chars'
+      score = '1'
     elif not is_subject_capitalized(message):
       status = 'Subject line must be capitalized.'
-      score = 'subject-not-capitalized'
+      score = '1'
     elif not subject_does_not_end_with_period(message):
       status = 'Subject line must not end with a period.'
-      score = 'subject-ending-with-a-period'
+      score = '1'
     elif not is_body_wrapped_at_72_chars(message):
       status = 'Commit message must be wrapped at 72 characters.'
-      score = 'body-not-wrapped-at-72-chars'
+      score = '1'
     elif not is_imperative(message):
       status = 'Subject line must use the imperative verb mood.'
-      score = 'subject-verbs-not-imperative'
+      score = '1'
     elif is_bump(message):
       status = 'Version bump: stick to project conventions.'
       score = 'bump'
@@ -146,4 +146,9 @@ def check_why_1_4(message):
   except:
     return 'error'
 
-print("::set-output score=::" + str(check_beams(input_commit_message)))
+score = check_beams(input_commit_message)
+if (int(score[0]) <=3 if score[0].isnumeric() else False):
+  sys.stderr.write(str(score[0]) + ': ' + score[1])
+  exit(1)
+
+print(str(score[0]) + ': ' + score[1])
