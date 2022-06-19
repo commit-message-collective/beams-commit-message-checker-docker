@@ -1,0 +1,4 @@
+transformers==4.20.0
+datasets==2.3.2
+onnxruntime==1.11.1
+emoji==1.7.0
