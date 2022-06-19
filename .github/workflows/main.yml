@@ -1,0 +1,15 @@
+on: [pull_request]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Check commit message
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check commit message
+        uses: ./
+        id: check-commit-message
+        with:
+          supplementary-ssh: ${{ secrets.SUPPLEMENTARY_SSH }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
