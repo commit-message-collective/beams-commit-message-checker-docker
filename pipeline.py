@@ -1,7 +1,6 @@
 import sys
 
 input_commit_message = sys.argv[1]
-input_extension = sys.argv[2]
 
 #%%
 from transformers import AutoTokenizer
@@ -147,4 +146,4 @@ def check_why_1_4(message):
   except:
     return 'error'
 
-print(check_beams(input_commit_message))
+print("::set-output score=::" + str(check_beams(input_commit_message)))

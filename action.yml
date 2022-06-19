@@ -1,0 +1,14 @@
+# action.yml
+name: 'Commit Quality Checker'
+inputs:
+  commit-message:
+    description: 'The commit message to check'
+    required: true
+outputs:
+  score:
+    description: 'A check score for the commit message'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.commit-message }}
