@@ -148,7 +148,5 @@ def check_why_1_4(message):
 
 score = check_beams(input_commit_message)
 if (int(score[0]) <=3 if score[0].isnumeric() else False):
-  sys.stderr.write(str(score[0]) + ': ' + score[1])
+  sys.stdout.write('Commit message quality ' + str(score[0]) + '/4' + (': ' + score[1] if int(score[0]) < 3 else '') )
   exit(1)
-
-print(str(score[0]) + ': ' + score[1])

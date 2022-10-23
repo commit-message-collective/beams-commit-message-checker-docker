@@ -1,11 +1,11 @@
 # action.yml
 name: 'Commit Quality Checker'
 inputs:
-  commit-message:
-    description: 'The commit message to check'
-    required: true
   supplementary-ssh:
-    description: 'SSH key with access to the supplementary materials repository containing the commit checking models.'
+    description: 'SSH key with access to the supplementary materials repository containing the commit checking models'
+    required: true
+  github-token:
+    description: 'A GitHub token used to post PR comments'
     required: true
 outputs:
   score:
@@ -13,10 +13,23 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Get repo
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Print head git commit message
+      id: get_head_commit_message
+      shell: bash
+      run: |
+        message=`git show -s --format=%s`
+        echo "message=$message" >> $GITHUB_OUTPUT
+
     - name: Prepare Key
       uses: webfactory/ssh-agent@v0.5.4
       with:
         ssh-private-key: ${{ inputs.supplementary-ssh }}
+
     - name: Build
       id: docker_build
       uses: docker/build-push-action@v2
@@ -30,5 +43,25 @@ runs:
         load: true
 
     - name: Evaluate commit message
+      id: eval_commit_message
+      continue-on-error: true
       shell: bash
-      run: docker run -e COMMIT_MESSAGE="${{ inputs.commit-message }}" ${{ steps.docker_build.outputs.imageid }}
+      run: |
+        result=`docker run -e COMMIT_MESSAGE="${{ steps.get_head_commit_message.outputs.message }}" ${{ steps.docker_build.outputs.imageid }} || true`
+        echo "result=$result" >> $GITHUB_OUTPUT
+
+    - name: Request changes to PR
+      if: ${{ steps.eval_commit_message.outputs.result }}
+      uses: Ana06/automatic-pull-request-review@v0.1.0
+      with:
+        repo-token: ${{ inputs.github-token }}
+        event: REQUEST_CHANGES
+        body: ⚠️ ${{ steps.eval_commit_message.outputs.result }}
+
+    - name: Approve PR
+      if: ${{ steps.eval_commit_message.outputs.result == '' }}
+      uses: Ana06/automatic-pull-request-review@v0.1.0
+      with:
+        repo-token: ${{ inputs.github-token }}
+        event: APPROVE
+        body: ✅ Commit message looks good.
