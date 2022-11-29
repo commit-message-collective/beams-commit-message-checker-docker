@@ -54,7 +54,7 @@ runs:
       continue-on-error: true
       shell: bash
       run: |
-        result=`docker run -e COMMIT_MESSAGE="${{ steps.get_head_commit_message.outputs.message }}" FILENAMES="${{ steps.get_head_commit_filenames.outputs.filenames }}" ${{ steps.docker_build.outputs.imageid }} || true`
+        result=`docker run -e COMMIT_MESSAGE="${{ steps.get_head_commit_message.outputs.message }}" -e FILENAMES="${{ steps.get_head_commit_filenames.outputs.filenames }}" ${{ steps.docker_build.outputs.imageid }} || true`
         echo "result=$result" >> $GITHUB_OUTPUT
 
     - name: Request changes to PR
