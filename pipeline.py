@@ -1,6 +1,7 @@
 import sys
 
 input_commit_message = sys.argv[1]
+filenames = sys.argv[2]
 
 #%%
 from transformers import AutoTokenizer
@@ -9,12 +10,13 @@ import numpy as np
 import emoji
 import onnxruntime as ort
 from tqdm import tqdm
+from collections import Counter
 
 tqdm.pandas()
 
 why_model_path = '../commit-quality-supplementary/tasks-inference/models/why.onnx'
 imperative_model_path = '../commit-quality-supplementary/tasks-inference/models/imperative.onnx'
-docs_model_path = '../commit-quality-supplementary/tasks-inference/models/docs.onnx'
+docs_model_path = '../commit-quality-supplementary/tasks-inference/models/docs-bimodal.onnx'
 bumps_model_path = '../commit-quality-supplementary/tasks-inference/models/bumps.onnx'
 
 MODEL_NAME = 'microsoft/codebert-base'
@@ -80,13 +82,33 @@ def check_why(message):
 def is_imperative(message):
   return np.argmax(imperative_session.run(None, dict(tokenizer(replace_links(message), return_tensors="np")))) == 1
 
-def is_documentation_change(message):
-  return np.argmax(docs_session.run(None, dict(tokenizer(replace_links(message), return_tensors="np")))) == 1
+def is_documentation_change(message, filenames):
+  sanitized_message = replace_links(message)
+  extensions = list(map(lambda x: get_extension_from_filename(x), filenames.split(',')))
+  counted_extensions = count_extensions(extensions)
+  return np.argmax(docs_session.run(None, dict(tokenizer(counted_extensions + '\n' + sanitized_message, return_tensors="np")))) == 1
+
+def get_extension_from_filename(filename):
+    result = re.search(r'\.([^.]*)$', filename)
+    if result:
+        return result[1]
+    return None
+
+def count_extensions(extensions):
+    counts = Counter(filter(lambda x: x is not None, extensions))
+    result = ''
+    for i, key in enumerate(counts):
+        value = counts[key]
+        result += key
+        result += str(value)
+        if i < len(counts) - 1:
+            result += ' '
+    return result
 
 def is_bump(message):
   return np.argmax(bumps_session.run(None, dict(tokenizer(replace_links(message), return_tensors="np")))) == 1
 
-def check_beams(message):
+def check_beams(message, filenames):
   status = None
   score = None
   try:
@@ -111,7 +133,7 @@ def check_beams(message):
     elif is_bump(message):
       status = 'Version bump: stick to project conventions.'
       score = 'bump'
-    elif is_documentation_change(message):
+    elif is_documentation_change(message, filenames):
       status = 'Documentation change: stick to project conventions.'
       score = 'doc'
     else:
@@ -146,7 +168,7 @@ def check_why_1_4(message):
   except:
     return 'error'
 
-score = check_beams(input_commit_message)
+score = check_beams(input_commit_message, filenames)
 if (int(score[0]) <=3 if score[0].isnumeric() else False):
   sys.stdout.write('Commit message quality ' + str(score[0]) + '/4' + (': ' + score[1] if int(score[0]) < 3 else '') )
   exit(1)

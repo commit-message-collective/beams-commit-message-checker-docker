@@ -25,6 +25,13 @@ runs:
         message=`git show -s --format=%s`
         echo "message=$message" >> $GITHUB_OUTPUT
 
+    - name: Print head git commit filenames
+      id: get_head_commit_filenames
+      shell: bash
+      run: |
+        filenames=`git show --pretty=format: --name-only | paste -sd "," -`
+        echo "filenames=$filenames" >> $GITHUB_OUTPUT
+
     - name: Prepare Key
       uses: webfactory/ssh-agent@v0.5.4
       with:
@@ -47,7 +54,7 @@ runs:
       continue-on-error: true
       shell: bash
       run: |
-        result=`docker run -e COMMIT_MESSAGE="${{ steps.get_head_commit_message.outputs.message }}" ${{ steps.docker_build.outputs.imageid }} || true`
+        result=`docker run -e COMMIT_MESSAGE="${{ steps.get_head_commit_message.outputs.message }}" FILENAMES="${{ steps.get_head_commit_filenames.outputs.filenames }}" ${{ steps.docker_build.outputs.imageid }} || true`
         echo "result=$result" >> $GITHUB_OUTPUT
 
     - name: Request changes to PR
