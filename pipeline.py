@@ -74,7 +74,10 @@ def subject_does_not_end_with_period(message):
     return message.split('\n')[0][-1] != '.'
 
 def is_body_wrapped_at_72_chars(message):
-    return all(list(map(lambda x: len(x) <= 72, message.split('\n'))))
+    lines = message.split('\n')
+    lines = map(lambda x: re.sub('http[s]?://\S+', '', x), lines)
+    lines = map(lambda x: len(x) <= 72, lines)
+    return all(list(lines))
 
 def check_why(message):
   return why_session.run(None, dict(tokenizer(replace_links(message), return_tensors="np")))[0][0][0]
