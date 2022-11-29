@@ -44,7 +44,7 @@ def remove_emoji(text, remove_components=True):
     cleaned = emoji.replace_emoji(text, replace='')
     if remove_components:
         cleaned = emoji_components.sub(u'', cleaned)
-    return cleaned
+    return cleaned.lstrip()
 
 def replace_links(message):
     message = re.sub("(^.*)\(#\d+\)\n(.*)", '\\1<pullRequestLink />\n\\2', message)
