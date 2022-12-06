@@ -67,6 +67,7 @@ def is_subject_max_72_chars(message):
     return len(message.split('\n')[0]) <= 72
 
 def is_subject_capitalized(message):
+    message = remove_emoji(message)
     return message[0].isupper()
 
 def subject_does_not_end_with_period(message):
@@ -82,6 +83,7 @@ def check_why(message):
   return why_session.run(None, dict(tokenizer(replace_links(message), return_tensors="np")))[0][0][0]
 
 def is_imperative(message):
+  message = remove_emoji(message)
   message = message.splitlines()[0]
   return np.argmax(imperative_session.run(None, dict(tokenizer(replace_links(message), return_tensors="np")))) == 1
 
@@ -114,7 +116,6 @@ def is_bump(message):
 def check_beams(message, filenames):
   status = None
   score = None
-  message = remove_emoji(message)
   try:
     if not is_subject_separated_from_body_by_blank_line(message):
       status = 'Subject line must be separated from the commit message body by a blank line.'
