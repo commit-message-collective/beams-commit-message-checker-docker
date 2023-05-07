@@ -174,6 +174,6 @@ def check_why_1_4(message):
     return 'error'
 
 score = check_beams(input_commit_message, filenames)
-if (int(score[0]) <=3 if score[0].isnumeric() else False):
-  sys.stdout.write('Commit message quality ' + str(score[0]) + '/4' + (': ' + score[1] if int(score[0]) < 3 else '') )
+if (int(score[0]) <=2 if score[0].isnumeric() else False):
+  sys.stdout.write(score[1])
   exit(1)
