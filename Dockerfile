@@ -11,9 +11,6 @@ RUN git lfs install
 RUN mkdir -p -m 0600 ~/.ssh && \
     ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
-RUN --mount=type=ssh \
-    git clone git@github.com:cpetrov/commit-quality-supplementary.git
-
 WORKDIR /app
 COPY . /app
 RUN python -m pip install --upgrade pip

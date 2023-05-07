@@ -14,10 +14,10 @@ from collections import Counter
 
 tqdm.pandas()
 
-why_model_path = '../commit-quality-supplementary/tasks-inference/models/why.onnx'
-imperative_model_path = '../commit-quality-supplementary/tasks-inference/models/imperative.onnx'
-docs_model_path = '../commit-quality-supplementary/tasks-inference/models/docs-bimodal.onnx'
-bumps_model_path = '../commit-quality-supplementary/tasks-inference/models/bumps.onnx'
+why_model_path = './models/why.onnx'
+imperative_model_path = './models/imperative.onnx'
+docs_model_path = './models/docs-bimodal.onnx'
+bumps_model_path = './models/bumps.onnx'
 
 MODEL_NAME = 'microsoft/codebert-base'
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
