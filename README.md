@@ -6,8 +6,10 @@ A docker image that runs a commit message quality checker based on Chris Beams' 
 
 ```sh
 docker build -t beams-commit-message-checker .
-docker tag beams-commit-message-checker ghcr.io/high-quality-commit-messages/beams-commit-message-checker:latest
-docker tag beams-commit-message-checker ghcr.io/high-quality-commit-messages/beams-commit-message-checker:0.1.0
+docker tag beams-commit-message-checker ghcr.io/commit-message-collective/beams-commit-message-checker:latest
+docker tag beams-commit-message-checker ghcr.io/commit-message-collective/beams-commit-message-checker:0.1.0
+docker push ghcr.io/commit-message-collective/beams-commit-message-checker:latest
+docker push ghcr.io/commit-message-collective/beams-commit-message-checker:0.1.0
 ```
 ## Run
 

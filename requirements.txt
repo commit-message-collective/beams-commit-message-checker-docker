@@ -1,5 +1,5 @@
 transformers==4.20.0
-tensorflow==2.10.0
-datasets==2.3.2
+tensorflow-cpu==2.10.0
 onnxruntime==1.11.1
 emoji==1.7.0
+pandas==1.5.3
